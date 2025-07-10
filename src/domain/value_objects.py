@@ -23,11 +23,44 @@ class YouTubeURL:
     
     def is_playlist(self) -> bool:
         """Check if the URL is a playlist URL."""
-        return "playlist" in self.url or "list=" in self.url
+        return any([
+            "playlist" in self.url,
+            "list=" in self.url,
+            "album" in self.url and "music.youtube.com" in self.url,
+            "&list=" in self.url
+        ])
     
     def is_channel(self) -> bool:
         """Check if the URL is a channel URL."""
         return "channel" in self.url or "user" in self.url or "c/" in self.url
+
+    def is_music_youtube(self) -> bool:
+        """Check if the URL is from music.youtube.com."""
+        return "music.youtube.com" in self.url
+    
+    def normalize_url(self) -> str:
+        """Normalize the URL for better compatibility."""
+        url = self.url
+        
+        # Remove tracking parameters
+        tracking_params = ['si=', 'feature=', 'utm_', 'fbclid=']
+        for param in tracking_params:
+            if param in url:
+                # Find the parameter and remove it along with its value
+                param_start = url.find(param)
+                if param_start != -1:
+                    # Find the next & or end of string
+                    param_end = url.find('&', param_start)
+                    if param_end == -1:
+                        param_end = len(url)
+                    # Remove the parameter
+                    before = url[:param_start]
+                    after = url[param_end:]
+                    url = before + after
+                    # Clean up double &s or trailing &
+                    url = url.replace('&&', '&').rstrip('&').rstrip('?')
+        
+        return url
 
 
 @dataclass(frozen=True)

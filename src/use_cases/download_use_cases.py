@@ -19,7 +19,26 @@ class GetVideoInfoUseCase:
         """Execute the use case to get video information."""
         try:
             youtube_url = YouTubeURL(url)
-            return await self._video_repository.get_video_info(youtube_url)
+            
+            # Check if this is a playlist URL being used with video command
+            if youtube_url.is_playlist():
+                suggestion = "playlist" if "playlist" in url or "list=" in url else "playlist"
+                if youtube_url.is_music_youtube():
+                    raise ValueError(
+                        f"This appears to be a playlist/album URL from YouTube Music. "
+                        f"Please use the '{suggestion}' command instead: "
+                        f"python main.py {suggestion} \"{url}\""
+                    )
+                else:
+                    raise ValueError(
+                        f"This appears to be a playlist URL. "
+                        f"Please use the '{suggestion}' command instead: "
+                        f"python main.py {suggestion} \"{url}\""
+                    )
+            
+            # Use normalized URL for better compatibility
+            normalized_url = YouTubeURL(youtube_url.normalize_url())
+            return await self._video_repository.get_video_info(normalized_url)
         except ValueError as e:
             raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
 
@@ -34,7 +53,9 @@ class GetPlaylistInfoUseCase:
         """Execute the use case to get playlist information."""
         try:
             youtube_url = YouTubeURL(url)
-            return await self._video_repository.get_playlist_info(youtube_url)
+            # Use normalized URL for better compatibility
+            normalized_url = YouTubeURL(youtube_url.normalize_url())
+            return await self._video_repository.get_playlist_info(normalized_url)
         except ValueError as e:
             raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
 

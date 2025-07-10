@@ -20,6 +20,8 @@ A powerful, clean architecture YouTube video and audio downloader with playlist 
 - **Error Handling**: Robust error handling with informative messages
 - **File Management**: Automatic directory creation and filename sanitization
 - **Anti-Bot Protection**: Browser-like headers to bypass YouTube's restrictions
+- **Music YouTube Support**: Full support for music.youtube.com URLs and playlists
+- **Smart URL Detection**: Helpful error messages when wrong command is used for playlist URLs
 
 ## Architecture
 
@@ -47,6 +49,23 @@ cd nerucordarchiver
 ```bash
 pip install -r requirements.txt
 ```
+
+## Supported URLs
+
+NeruCord Archiver supports a wide variety of YouTube and YouTube Music URLs:
+
+### YouTube URLs
+- **Individual Videos**: `https://youtube.com/watch?v=VIDEO_ID` or `https://youtu.be/VIDEO_ID`
+- **Playlists**: `https://youtube.com/playlist?list=PLAYLIST_ID`
+- **Channels**: `https://youtube.com/channel/CHANNEL_ID` or `https://youtube.com/user/USERNAME`
+
+### YouTube Music URLs
+- **Individual Tracks**: `https://music.youtube.com/watch?v=VIDEO_ID`
+- **Playlists**: `https://music.youtube.com/playlist?list=PLAYLIST_ID`
+- **Albums**: `https://music.youtube.com/album/ALBUM_ID`
+- **Browse Pages**: `https://music.youtube.com/browse/BROWSE_ID`
+
+**Note**: The application automatically detects playlist URLs and provides helpful error messages if you use the wrong command. For example, if you try to use the `video` command with a playlist URL, it will suggest using the `playlist` command instead.
 
 ## Usage
 
@@ -259,6 +278,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **ADDED**: Automatic video/audio stream merging for optimal quality
 - **IMPROVED**: Cross-platform Downloads folder detection (Windows/Linux/Mac)
 - **CHANGED**: Default download location to `~/Downloads/NeruCord/` for better organization
+
+### v1.0.2
+- **ADDED**: Full support for music.youtube.com URLs and playlists
+- **IMPROVED**: Smart URL detection with helpful error messages when wrong command is used
+- **ENHANCED**: URL normalization to remove tracking parameters for better compatibility
+- **FIXED**: Issue where playlist URLs used with `video` command gave cryptic error messages
+- **ADDED**: Comprehensive tests for music.youtube.com support and URL validation
 
 ## Support
 

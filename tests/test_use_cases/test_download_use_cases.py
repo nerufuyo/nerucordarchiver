@@ -34,6 +34,23 @@ class TestGetVideoInfoUseCase:
         
         with pytest.raises(ValueError, match="Invalid YouTube URL"):
             await use_case.execute("invalid_url")
+    
+    @pytest.mark.asyncio
+    async def test_execute_playlist_url_raises_helpful_error(self, mock_video_repository):
+        """Test that playlist URL with video command raises helpful error."""
+        use_case = GetVideoInfoUseCase(mock_video_repository)
+        
+        # Test regular YouTube playlist
+        with pytest.raises(ValueError, match="This appears to be a playlist URL.*python main.py playlist"):
+            await use_case.execute("https://youtube.com/playlist?list=PLtest123")
+        
+        # Test music.youtube.com playlist  
+        with pytest.raises(ValueError, match="This appears to be a playlist/album URL from YouTube Music.*python main.py playlist"):
+            await use_case.execute("https://music.youtube.com/playlist?list=PLtest123")
+        
+        # Test music.youtube.com album
+        with pytest.raises(ValueError, match="This appears to be a playlist/album URL from YouTube Music.*python main.py playlist"):
+            await use_case.execute("https://music.youtube.com/album/MPREb_1234567890")
 
 
 class TestGetPlaylistInfoUseCase:

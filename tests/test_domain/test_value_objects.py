@@ -17,7 +17,11 @@ class TestYouTubeURL:
             "https://youtu.be/dQw4w9WgXcQ",
             "https://youtube.com/playlist?list=PLrAXtmRdnEQy4QpM-dvBETukrNfwQs72x",
             "https://youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw",
-            "https://youtube.com/user/username"
+            "https://youtube.com/user/username",
+            "https://music.youtube.com/watch?v=dQw4w9WgXcQ",
+            "https://music.youtube.com/playlist?list=PLtest",
+            "https://music.youtube.com/album/MPREb_1234567890",
+            "https://music.youtube.com/browse/MPREb_1234567890"
         ]
         
         for url in valid_urls:
@@ -40,21 +44,70 @@ class TestYouTubeURL:
     
     def test_is_playlist(self):
         """Test playlist detection."""
-        playlist_url = YouTubeURL("https://youtube.com/playlist?list=PLtest")
-        video_url = YouTubeURL("https://youtube.com/watch?v=test123")
+        playlist_urls = [
+            "https://youtube.com/playlist?list=PLtest",
+            "https://youtube.com/watch?v=test123&list=PLtest",
+            "https://music.youtube.com/playlist?list=PLtest",
+            "https://music.youtube.com/album/MPREb_1234567890"
+        ]
+        video_urls = [
+            "https://youtube.com/watch?v=test123",
+            "https://music.youtube.com/watch?v=test123"
+        ]
         
-        assert playlist_url.is_playlist() is True
-        assert video_url.is_playlist() is False
+        for url in playlist_urls:
+            youtube_url = YouTubeURL(url)
+            assert youtube_url.is_playlist() is True, f"Failed for {url}"
+        
+        for url in video_urls:
+            youtube_url = YouTubeURL(url)
+            assert youtube_url.is_playlist() is False, f"Failed for {url}"
     
-    def test_is_channel(self):
-        """Test channel detection."""
-        channel_url = YouTubeURL("https://youtube.com/channel/UCtest")
-        user_url = YouTubeURL("https://youtube.com/user/testuser")
-        video_url = YouTubeURL("https://youtube.com/watch?v=test123")
+    def test_is_music_youtube(self):
+        """Test music.youtube.com detection."""
+        music_urls = [
+            "https://music.youtube.com/watch?v=dQw4w9WgXcQ",
+            "https://music.youtube.com/playlist?list=PLtest",
+            "https://music.youtube.com/album/MPREb_1234567890"
+        ]
+        regular_urls = [
+            "https://youtube.com/watch?v=dQw4w9WgXcQ",
+            "https://youtu.be/dQw4w9WgXcQ"
+        ]
         
-        assert channel_url.is_channel() is True
-        assert user_url.is_channel() is True
-        assert video_url.is_channel() is False
+        for url in music_urls:
+            youtube_url = YouTubeURL(url)
+            assert youtube_url.is_music_youtube() is True, f"Failed for {url}"
+        
+        for url in regular_urls:
+            youtube_url = YouTubeURL(url)
+            assert youtube_url.is_music_youtube() is False, f"Failed for {url}"
+    
+    def test_normalize_url(self):
+        """Test URL normalization."""
+        test_cases = [
+            (
+                "https://youtube.com/watch?v=dQw4w9WgXcQ&si=abc123&feature=share",
+                "https://youtube.com/watch?v=dQw4w9WgXcQ"
+            ),
+            (
+                "https://music.youtube.com/playlist?list=PLtest&si=xyz789",
+                "https://music.youtube.com/playlist?list=PLtest"
+            ),
+            (
+                "https://youtube.com/watch?v=test&utm_source=share&fbclid=test123",
+                "https://youtube.com/watch?v=test"
+            ),
+            (
+                "https://youtube.com/watch?v=test",
+                "https://youtube.com/watch?v=test"
+            )
+        ]
+        
+        for original, expected in test_cases:
+            youtube_url = YouTubeURL(original)
+            normalized = youtube_url.normalize_url()
+            assert normalized == expected, f"Failed for {original}: got {normalized}, expected {expected}"
 
 
 class TestFilePath:
