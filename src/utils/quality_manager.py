@@ -152,17 +152,19 @@ class DownloadResume:
 
 
 def get_video_format_options(quality: str) -> str:
-    """Get yt-dlp format string for video quality."""
+    """Get yt-dlp format string for video quality with robust fallback options."""
+    # Simplified format selection that works better with YouTube's current format structure
     quality_map = {
-        '240p': 'worst[height<=240]',
-        '360p': 'worst[height<=360]',
-        '480p': 'best[height<=480]',
-        '720p': 'best[height<=720]',
-        '1080p': 'best[height<=1080]',
-        '1440p': 'best[height<=1440]',
-        '2160p': 'best[height<=2160]'
+        '240p': 'bestvideo[height<=240]+bestaudio/worst',
+        '360p': 'bestvideo[height<=360]+bestaudio/best',
+        '480p': 'bestvideo[height<=480]+bestaudio/best', 
+        '720p': 'bestvideo[height<=720]+bestaudio/best',
+        '1080p': 'bestvideo[height<=1080]+bestaudio/best',
+        '1440p': 'bestvideo[height<=1440]+bestaudio/best',
+        '2160p': 'bestvideo[height<=2160]+bestaudio/best'
     }
-    return quality_map.get(quality, 'best[height<=720]')
+    # Default to 720p
+    return quality_map.get(quality, 'bestvideo[height<=720]+bestaudio/best')
 
 
 def get_audio_format_options(quality: str, format: str) -> Dict[str, Any]:

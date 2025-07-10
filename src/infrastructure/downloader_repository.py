@@ -45,12 +45,28 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
             'format': format_string,
             'outtmpl': output_template,
             'progress_hooks': [progress_hook] if progress_callback else [],
-            'quiet': True,
-            'no_warnings': True,
         }
         
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([task.video_info.url])
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([task.video_info.url])
+        except Exception as e:
+            # If specific format fails, try with video+audio merge approach
+            if "Requested format is not available" in str(e) or "format" in str(e).lower():
+                ydl_opts['format'] = 'bestvideo+bestaudio/best'
+                try:
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        ydl.download([task.video_info.url])
+                except Exception as e2:
+                    # If that fails too, let yt-dlp auto-select without format restrictions
+                    del ydl_opts['format']
+                    try:
+                        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                            ydl.download([task.video_info.url])
+                    except Exception as e3:
+                        raise e3
+            else:
+                raise e
         
         # Find the downloaded file
         expected_path = os.path.join(task.output_path, f"{filename}.{VIDEO_FORMAT}")
