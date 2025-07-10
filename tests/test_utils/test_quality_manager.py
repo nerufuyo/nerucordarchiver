@@ -91,10 +91,10 @@ class TestFormatOptions:
     
     def test_get_video_format_options(self):
         """Test video format options generation."""
-        assert get_video_format_options('720p') == 'best[height<=720]/best[width<=1280]/best'
-        assert get_video_format_options('1080p') == 'best[height<=1080]/best[width<=1920]/best'
-        assert get_video_format_options('240p') == 'best[height<=240]/best[width<=426]/worst'
-        assert get_video_format_options('unknown') == 'best[height<=720]/best[width<=1280]/best'  # default
+        assert get_video_format_options('720p') == 'bestvideo[height<=720]+bestaudio/best'
+        assert get_video_format_options('1080p') == 'bestvideo[height<=1080]+bestaudio/best'
+        assert get_video_format_options('240p') == 'bestvideo[height<=240]+bestaudio/worst'
+        assert get_video_format_options('unknown') == 'bestvideo[height<=720]+bestaudio/best'  # default
     
     def test_get_audio_format_options(self):
         """Test audio format options generation."""

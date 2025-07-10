@@ -4,7 +4,7 @@ A powerful, clean architecture YouTube video and audio downloader with playlist 
 
 ## Features
 
-- **Download YouTube Videos**: High-quality video downloads up to 720p
+- **Download YouTube Videos**: High-quality video downloads up to 2160p (4K)
 - **Convert to Audio**: Extract and convert videos to MP3 format with customizable quality
 - **Playlist Support**: Download entire playlists with progress tracking
 - **Batch Downloads**: Process multiple URLs from text files
@@ -17,6 +17,7 @@ A powerful, clean architecture YouTube video and audio downloader with playlist 
 - **Progress Tracking**: Real-time download progress for both single files and playlists
 - **Error Handling**: Robust error handling with informative messages
 - **File Management**: Automatic directory creation and filename sanitization
+- **Anti-Bot Protection**: Browser-like headers to bypass YouTube's restrictions
 
 ## Architecture
 
@@ -147,7 +148,7 @@ python main.py info "https://youtube.com/playlist?list=PLAYLIST_ID"
 Default settings can be found in `src/config/constants.py`:
 
 - **Audio Quality**: 192 kbps MP3
-- **Video Quality**: 720p MP4
+- **Video Quality**: 720p WebM/MP4  
 - **Download Paths**: `./downloads/video` and `./downloads/audio`
 - **Supported Formats**: MP3, MP4, WebM, MKV, AVI, WAV, FLAC, AAC
 
@@ -193,6 +194,25 @@ The application provides clear error messages for common issues:
 - **Network Issues**: Handles connection timeouts and errors
 - **File System**: Manages directory creation and permissions
 - **Download Failures**: Provides specific error information
+- **Format Compatibility**: Automatic fallback to compatible formats
+- **YouTube Restrictions**: Uses browser-like headers to bypass anti-bot measures
+
+### Troubleshooting
+
+**403 Forbidden Errors:**
+- The application includes anti-bot protection with browser-like headers
+- If you encounter persistent 403 errors, try waiting a few minutes before retrying
+- Consider using lower quality settings to reduce bandwidth usage
+
+**Format Not Available:**
+- The application automatically tries multiple format combinations
+- Falls back from quality-specific to general formats if needed
+- Always attempts to merge video and audio streams for best quality
+
+**Slow Downloads:**
+- Use lower quality settings for faster downloads
+- Check your internet connection
+- Some videos may have rate limiting applied by YouTube
 
 ## Dependencies
 
@@ -221,6 +241,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Comprehensive test suite
 - CLI interface with progress tracking
 - Support for videos, audio, and playlists
+
+### v1.0.1
+- **FIXED**: Video format selection compatibility with YouTube's current format structure
+- **FIXED**: HTTP 403 Forbidden errors with browser-like headers and anti-bot protection
+- **IMPROVED**: Robust three-tier format fallback system
+- **ENHANCED**: Support for up to 2160p (4K) video downloads
+- **ADDED**: Automatic video/audio stream merging for optimal quality
 
 ## Support
 
