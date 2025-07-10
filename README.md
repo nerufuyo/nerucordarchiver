@@ -149,7 +149,7 @@ Default settings can be found in `src/config/constants.py`:
 
 - **Audio Quality**: 192 kbps MP3
 - **Video Quality**: 720p WebM/MP4  
-- **Download Paths**: `./downloads/video` and `./downloads/audio`
+- **Download Paths**: `~/Downloads/NeruCord/video` and `~/Downloads/NeruCord/audio` (cross-platform)
 - **Supported Formats**: MP3, MP4, WebM, MKV, AVI, WAV, FLAC, AAC
 
 ## Development
@@ -248,6 +248,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **IMPROVED**: Robust three-tier format fallback system
 - **ENHANCED**: Support for up to 2160p (4K) video downloads
 - **ADDED**: Automatic video/audio stream merging for optimal quality
+- **IMPROVED**: Cross-platform Downloads folder detection (Windows/Linux/Mac)
+- **CHANGED**: Default download location to `~/Downloads/NeruCord/` for better organization
 
 ## Support
 

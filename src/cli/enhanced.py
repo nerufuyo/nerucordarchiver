@@ -20,7 +20,7 @@ from ..use_cases.download_use_cases import (
     DownloadPlaylistUseCase
 )
 from ..config.settings import Config
-from ..config.constants import APP_NAME
+from ..config.constants import APP_NAME, DEFAULT_DOWNLOAD_PATH
 
 
 class BatchDownloader:
@@ -158,7 +158,7 @@ def config(quality: str, format: str, video_quality: str, output_dir: str, show:
         click.echo(f"{Fore.GREEN}  Audio Quality: {current_config.get('audio_quality', '192')} kbps")
         click.echo(f"{Fore.GREEN}  Audio Format: {current_config.get('audio_format', 'mp3')}")
         click.echo(f"{Fore.GREEN}  Video Quality: {current_config.get('video_quality', '720p')}")
-        click.echo(f"{Fore.GREEN}  Output Directory: {current_config.get('output_dir', './downloads')}")
+        click.echo(f"{Fore.GREEN}  Output Directory: {current_config.get('output_dir', DEFAULT_DOWNLOAD_PATH)}")
         return
     
     # Update config

@@ -20,7 +20,8 @@ class TestQualityManager:
             assert qm.get_audio_quality() == "192"
             assert qm.get_audio_format() == "mp3"
             assert qm.get_video_quality() == "720p"
-            assert qm.get_output_dir() == "./downloads"
+            # Output dir should end with NeruCord (platform-specific path)
+            assert qm.get_output_dir().endswith("NeruCord")
     
     def test_load_custom_config(self):
         """Test loading custom configuration."""

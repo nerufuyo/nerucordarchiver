@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 from typing import Optional, Dict, Any
-from ..config.constants import AUDIO_QUALITY, VIDEO_QUALITY, AUDIO_FORMAT
+from ..config.constants import AUDIO_QUALITY, VIDEO_QUALITY, AUDIO_FORMAT, DEFAULT_DOWNLOAD_PATH
 
 
 class QualityManager:
@@ -32,7 +32,7 @@ class QualityManager:
             'audio_quality': AUDIO_QUALITY,
             'video_quality': VIDEO_QUALITY,
             'audio_format': AUDIO_FORMAT,
-            'output_dir': './downloads'
+            'output_dir': DEFAULT_DOWNLOAD_PATH
         }
     
     def get_audio_quality(self) -> str:
@@ -49,7 +49,7 @@ class QualityManager:
     
     def get_output_dir(self) -> str:
         """Get configured output directory."""
-        return self._config.get('output_dir', './downloads')
+        return self._config.get('output_dir', DEFAULT_DOWNLOAD_PATH)
 
 
 class DownloadResume:

@@ -4,15 +4,44 @@ Global configuration constants for the YouTube Archiver application.
 This module contains all configurable values used throughout the application.
 """
 
+import os
+from pathlib import Path
+
+def get_default_download_path():
+    """Get the default Downloads folder for the current platform."""
+    # Get user's home directory
+    home = Path.home()
+    
+    # Try to find Downloads folder (handles different languages/localizations)
+    downloads_candidates = [
+        home / "Downloads",
+        home / "downloads", 
+        home / "Download",
+        home / "download",
+        home / "Téléchargements",  # French
+        home / "Descargas",       # Spanish
+        home / "下载",             # Chinese
+        home / "ダウンロード",        # Japanese
+    ]
+    
+    # Return the first existing Downloads folder, or create Downloads if none exist
+    for downloads_path in downloads_candidates:
+        if downloads_path.exists() and downloads_path.is_dir():
+            return str(downloads_path / "NeruCord")
+    
+    # Fallback: create Downloads folder if it doesn't exist
+    downloads_path = home / "Downloads" / "NeruCord"
+    return str(downloads_path)
+
 # Application Information
 APP_NAME = "NeruCord Archiver"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 APP_DESCRIPTION = "A powerful YouTube video and audio downloader with playlist support"
 
 # Download Paths
-DEFAULT_DOWNLOAD_PATH = "./downloads"
-AUDIO_DOWNLOAD_PATH = "./downloads/audio"
-VIDEO_DOWNLOAD_PATH = "./downloads/video"
+DEFAULT_DOWNLOAD_PATH = get_default_download_path()
+AUDIO_DOWNLOAD_PATH = os.path.join(DEFAULT_DOWNLOAD_PATH, "audio")
+VIDEO_DOWNLOAD_PATH = os.path.join(DEFAULT_DOWNLOAD_PATH, "video")
 
 # File Formats
 AUDIO_FORMAT = "mp3"
