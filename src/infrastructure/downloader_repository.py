@@ -9,6 +9,7 @@ from pathlib import Path
 from ..repositories.interfaces import IDownloaderRepository, IFileRepository
 from ..domain.entities import DownloadTask, DownloadType
 from ..config.constants import AUDIO_FORMAT, VIDEO_FORMAT, AUDIO_QUALITY
+from ..utils.quality_manager import QualityManager, get_video_format_options, get_audio_format_options
 
 
 class YTDLPDownloaderRepository(IDownloaderRepository):
@@ -16,6 +17,7 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
     
     def __init__(self, file_repository: IFileRepository):
         self._file_repository = file_repository
+        self._quality_manager = QualityManager()
     
     async def download_video(
         self, 
@@ -36,8 +38,11 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
         filename = self._file_repository.sanitize_filename(task.video_info.title)
         output_template = os.path.join(task.output_path, f"{filename}.%(ext)s")
         
+        video_quality = self._quality_manager.get_video_quality()
+        format_string = get_video_format_options(video_quality)
+        
         ydl_opts = {
-            'format': f'best[height<=720]/{VIDEO_FORMAT}',
+            'format': format_string,
             'outtmpl': output_template,
             'progress_hooks': [progress_hook] if progress_callback else [],
             'quiet': True,
@@ -81,15 +86,15 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
         filename = self._file_repository.sanitize_filename(task.video_info.title)
         output_template = os.path.join(task.output_path, f"{filename}.%(ext)s")
         
+        audio_quality = self._quality_manager.get_audio_quality()
+        audio_format = self._quality_manager.get_audio_format()
+        audio_postprocessor = get_audio_format_options(audio_quality, audio_format)
+        
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': output_template,
             'progress_hooks': [progress_hook] if progress_callback else [],
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': AUDIO_FORMAT,
-                'preferredquality': AUDIO_QUALITY,
-            }],
+            'postprocessors': [audio_postprocessor],
             'quiet': True,
             'no_warnings': True,
         }
@@ -101,13 +106,14 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
             progress_callback(100)  # 100% after conversion
         
         # Find the downloaded audio file
-        expected_path = os.path.join(task.output_path, f"{filename}.{AUDIO_FORMAT}")
+        audio_format = self._quality_manager.get_audio_format()
+        expected_path = os.path.join(task.output_path, f"{filename}.{audio_format}")
         if os.path.exists(expected_path):
             return expected_path
         
         # If exact path doesn't exist, find the actual downloaded file
         for file in os.listdir(task.output_path):
-            if file.startswith(filename) and file.endswith(f".{AUDIO_FORMAT}"):
+            if file.startswith(filename) and file.endswith(f".{audio_format}"):
                 return os.path.join(task.output_path, file)
         
         raise RuntimeError("Downloaded audio file not found")

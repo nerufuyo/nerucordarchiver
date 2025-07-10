@@ -1,0 +1,10 @@
+# Example YouTube URLs for batch download
+# Single videos
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
+https://www.youtube.com/watch?v=jNQXAC9IVRw
+
+# Playlists
+https://www.youtube.com/playlist?list=PLrAXtmRdnEQy4QpM-dvBETukrNfwQs72x
+
+# Comments (lines starting with #) are ignored
+# Empty lines are also ignored

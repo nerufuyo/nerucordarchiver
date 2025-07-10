@@ -22,6 +22,7 @@ from ..config.constants import (
     APP_NAME, APP_VERSION, APP_DESCRIPTION,
     SUCCESS_DOWNLOAD_COMPLETE, PROGRESS_DOWNLOADING, PROGRESS_CONVERTING
 )
+from .enhanced import register_enhanced_commands
 
 # Initialize colorama for cross-platform colored output
 init(autoreset=True)
@@ -242,6 +243,10 @@ def info(url: str):
             click.echo(f"{Fore.RED}❌ Error: {str(e)}")
     
     asyncio.run(get_info())
+
+
+# Register enhanced commands
+register_enhanced_commands(cli)
 
 
 if __name__ == '__main__':
