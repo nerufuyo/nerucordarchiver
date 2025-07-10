@@ -7,6 +7,11 @@ A powerful, clean architecture YouTube video and audio downloader with playlist 
 - **Download YouTube Videos**: High-quality video downloads up to 720p
 - **Convert to Audio**: Extract and convert videos to MP3 format with customizable quality
 - **Playlist Support**: Download entire playlists with progress tracking
+- **Batch Downloads**: Process multiple URLs from text files
+- **Quality Control**: Configurable video quality (240p-2160p) and audio bitrates (128-320 kbps)
+- **Format Options**: Support for MP3, FLAC, WAV, AAC audio formats
+- **Resume Capability**: Track download history and resume failed downloads
+- **Configuration Management**: Persistent user preferences and settings
 - **Single or Batch Downloads**: Handle individual videos or complete playlists
 - **Clean CLI Interface**: Easy-to-use command-line interface with colored output
 - **Progress Tracking**: Real-time download progress for both single files and playlists
@@ -75,6 +80,38 @@ python main.py playlist "https://youtube.com/playlist?list=PLAYLIST_ID" --type v
 python main.py playlist "https://youtube.com/playlist?list=PLAYLIST_ID" --output /path/to/downloads
 ```
 
+### Batch Download
+
+```bash
+# Download multiple videos from a file (one URL per line)
+python main.py batch urls.txt
+
+# Download as video format
+python main.py batch urls.txt --type video
+
+# Use custom output directory
+python main.py batch urls.txt --output /path/to/downloads
+```
+
+### Configuration Management
+
+```bash
+# Show current configuration
+python main.py config --show
+
+# Set audio quality (128, 192, 256, 320 kbps)
+python main.py config --quality 320
+
+# Set audio format
+python main.py config --format flac
+
+# Set video quality (240p, 360p, 480p, 720p, 1080p, 1440p, 2160p)
+python main.py config --video-quality 1080p
+
+# Set default output directory
+python main.py config --output-dir /path/to/downloads
+```
+
 ### Get Information
 
 ```bash
@@ -90,12 +127,18 @@ python main.py info "https://youtube.com/playlist?list=PLAYLIST_ID"
 - `video` - Download YouTube video
 - `audio` - Download and convert YouTube video to MP3
 - `playlist` - Download entire YouTube playlist
+- `batch` - Download multiple videos from a file containing URLs
+- `config` - Manage application configuration and preferences
 - `info` - Get information about video or playlist
 
 ### Options
 
 - `--output, -o` - Specify output directory
-- `--type, -t` - For playlists: choose 'video' or 'audio' (default: audio)
+- `--type, -t` - For playlists and batch: choose 'video' or 'audio' (default: audio)
+- `--quality, -q` - Set audio quality (config command)
+- `--format, -f` - Set audio format (config command)
+- `--video-quality` - Set video quality (config command)
+- `--show` - Show current configuration (config command)
 - `--help` - Show help message
 - `--version` - Show version information
 
