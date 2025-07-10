@@ -52,7 +52,9 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
                 'youtube': {
                     'skip': ['dash', 'hls']
                 }
-            }
+            },
+            'socket_timeout': 60,
+            'retries': 3,
         }
         
         try:
@@ -126,7 +128,9 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
                 'youtube': {
                     'skip': ['dash', 'hls']
                 }
-            }
+            },
+            'socket_timeout': 60,
+            'retries': 3,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
