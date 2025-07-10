@@ -1,0 +1,174 @@
+"""
+Use cases for the YouTube Archiver application.
+"""
+
+from typing import List, Optional, Callable
+from ..domain.entities import VideoInfo, PlaylistInfo, DownloadTask, DownloadType, DownloadStatus
+from ..domain.value_objects import YouTubeURL
+from ..repositories.interfaces import IVideoRepository, IDownloaderRepository, IFileRepository
+from ..config.constants import ERROR_INVALID_URL, ERROR_DOWNLOAD_FAILED, SUCCESS_DOWNLOAD_COMPLETE
+
+
+class GetVideoInfoUseCase:
+    """Use case for getting video information."""
+    
+    def __init__(self, video_repository: IVideoRepository):
+        self._video_repository = video_repository
+    
+    async def execute(self, url: str) -> VideoInfo:
+        """Execute the use case to get video information."""
+        try:
+            youtube_url = YouTubeURL(url)
+            return await self._video_repository.get_video_info(youtube_url)
+        except ValueError as e:
+            raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
+
+
+class GetPlaylistInfoUseCase:
+    """Use case for getting playlist information."""
+    
+    def __init__(self, video_repository: IVideoRepository):
+        self._video_repository = video_repository
+    
+    async def execute(self, url: str) -> PlaylistInfo:
+        """Execute the use case to get playlist information."""
+        try:
+            youtube_url = YouTubeURL(url)
+            return await self._video_repository.get_playlist_info(youtube_url)
+        except ValueError as e:
+            raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
+
+
+class DownloadVideoUseCase:
+    """Use case for downloading video."""
+    
+    def __init__(
+        self, 
+        downloader_repository: IDownloaderRepository,
+        file_repository: IFileRepository
+    ):
+        self._downloader_repository = downloader_repository
+        self._file_repository = file_repository
+    
+    async def execute(
+        self, 
+        video_info: VideoInfo, 
+        output_path: str,
+        progress_callback: Optional[Callable[[float], None]] = None
+    ) -> str:
+        """Execute the use case to download video."""
+        try:
+            # Create directory if it doesn't exist
+            self._file_repository.create_directory(output_path)
+            
+            # Create download task
+            task = DownloadTask(
+                video_info=video_info,
+                download_type=DownloadType.VIDEO,
+                output_path=output_path
+            )
+            
+            task.status = DownloadStatus.DOWNLOADING
+            file_path = await self._downloader_repository.download_video(task, progress_callback)
+            task.mark_completed()
+            
+            return file_path
+        except Exception as e:
+            raise RuntimeError(f"{ERROR_DOWNLOAD_FAILED}: {str(e)}")
+
+
+class DownloadAudioUseCase:
+    """Use case for downloading and converting to audio."""
+    
+    def __init__(
+        self, 
+        downloader_repository: IDownloaderRepository,
+        file_repository: IFileRepository
+    ):
+        self._downloader_repository = downloader_repository
+        self._file_repository = file_repository
+    
+    async def execute(
+        self, 
+        video_info: VideoInfo, 
+        output_path: str,
+        progress_callback: Optional[Callable[[float], None]] = None
+    ) -> str:
+        """Execute the use case to download and convert to audio."""
+        try:
+            # Create directory if it doesn't exist
+            self._file_repository.create_directory(output_path)
+            
+            # Create download task
+            task = DownloadTask(
+                video_info=video_info,
+                download_type=DownloadType.AUDIO,
+                output_path=output_path
+            )
+            
+            task.status = DownloadStatus.DOWNLOADING
+            file_path = await self._downloader_repository.download_audio(task, progress_callback)
+            task.mark_completed()
+            
+            return file_path
+        except Exception as e:
+            raise RuntimeError(f"{ERROR_DOWNLOAD_FAILED}: {str(e)}")
+
+
+class DownloadPlaylistUseCase:
+    """Use case for downloading entire playlist."""
+    
+    def __init__(
+        self,
+        video_repository: IVideoRepository,
+        downloader_repository: IDownloaderRepository,
+        file_repository: IFileRepository
+    ):
+        self._video_repository = video_repository
+        self._downloader_repository = downloader_repository
+        self._file_repository = file_repository
+    
+    async def execute(
+        self,
+        playlist_url: str,
+        download_type: DownloadType,
+        output_path: str,
+        progress_callback: Optional[Callable[[int, int, str], None]] = None
+    ) -> List[str]:
+        """Execute the use case to download entire playlist."""
+        try:
+            youtube_url = YouTubeURL(playlist_url)
+            playlist_info = await self._video_repository.get_playlist_info(youtube_url)
+            
+            downloaded_files = []
+            total_videos = len(playlist_info.videos)
+            
+            for index, video_info in enumerate(playlist_info.videos):
+                try:
+                    if progress_callback:
+                        progress_callback(index + 1, total_videos, video_info.title)
+                    
+                    task = DownloadTask(
+                        video_info=video_info,
+                        download_type=download_type,
+                        output_path=output_path
+                    )
+                    
+                    if download_type == DownloadType.AUDIO:
+                        file_path = await self._downloader_repository.download_audio(task)
+                    else:
+                        file_path = await self._downloader_repository.download_video(task)
+                    
+                    downloaded_files.append(file_path)
+                    
+                except Exception as e:
+                    # Log error but continue with next video
+                    print(f"Failed to download {video_info.title}: {str(e)}")
+                    continue
+            
+            return downloaded_files
+            
+        except ValueError as e:
+            raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
+        except Exception as e:
+            raise RuntimeError(f"{ERROR_DOWNLOAD_FAILED}: {str(e)}")

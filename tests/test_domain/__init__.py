@@ -1,0 +1,3 @@
+"""
+Test domain package initialization.
+"""

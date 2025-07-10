@@ -1,0 +1,3 @@
+"""
+Test infrastructure package initialization.
+"""
