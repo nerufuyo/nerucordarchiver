@@ -2,6 +2,8 @@
 
 A powerful, clean architecture YouTube video and audio downloader with playlist support. Built with Python using clean code principles and comprehensive testing.
 
+> **⚠️ Current Status (July 2025)**: YouTube has enhanced their anti-bot detection, causing temporary 403 errors for all YouTube downloaders. This is a platform-wide issue affecting yt-dlp and all derived tools. The application works correctly when YouTube's restrictions are lifted.
+
 ## Features
 
 - **Download YouTube Videos**: High-quality video downloads up to 2160p (4K)
@@ -201,8 +203,13 @@ The application provides clear error messages for common issues:
 
 **403 Forbidden Errors:**
 - The application includes anti-bot protection with browser-like headers
-- If you encounter persistent 403 errors, try waiting a few minutes before retrying
-- Consider using lower quality settings to reduce bandwidth usage
+- **Current Status**: YouTube has enhanced their anti-bot detection (as of July 2025)
+- **Solutions**:
+  - Wait 15-30 minutes before retrying (rate limiting)
+  - Try different videos (some may work while others don't)
+  - Use VPN or different network if available
+  - Consider using lower quality settings
+  - Check [yt-dlp GitHub issues](https://github.com/yt-dlp/yt-dlp/issues) for updates
 
 **Format Not Available:**
 - The application automatically tries multiple format combinations
@@ -213,6 +220,8 @@ The application provides clear error messages for common issues:
 - Use lower quality settings for faster downloads
 - Check your internet connection
 - Some videos may have rate limiting applied by YouTube
+
+**Note**: 403 errors are typically temporary and affect all YouTube downloaders. The application will work normally once YouTube's restrictions are lifted.
 
 ## Dependencies
 
