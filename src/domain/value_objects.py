@@ -32,7 +32,13 @@ class YouTubeURL:
     
     def is_channel(self) -> bool:
         """Check if the URL is a channel URL."""
-        return "channel" in self.url or "user" in self.url or "c/" in self.url
+        return any([
+            "channel" in self.url,
+            "user" in self.url,
+            "c/" in self.url,
+            "@" in self.url and "youtube.com/" in self.url,
+            "/videos" in self.url and "youtube.com/" in self.url
+        ])
 
     def is_music_youtube(self) -> bool:
         """Check if the URL is from music.youtube.com."""

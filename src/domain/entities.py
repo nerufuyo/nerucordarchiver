@@ -59,6 +59,25 @@ class PlaylistInfo:
 
 
 @dataclass
+class ChannelInfo:
+    """Entity representing channel information."""
+    title: str
+    url: str
+    videos: List[VideoInfo]
+    uploader: Optional[str] = None
+    video_count: Optional[int] = None
+    subscriber_count: Optional[int] = None
+    
+    def __post_init__(self):
+        if not self.url:
+            raise ValueError("Channel URL cannot be empty")
+        if not self.title:
+            raise ValueError("Channel title cannot be empty")
+        if self.video_count is None:
+            self.video_count = len(self.videos)
+
+
+@dataclass
 class DownloadTask:
     """Entity representing a download task."""
     video_info: VideoInfo

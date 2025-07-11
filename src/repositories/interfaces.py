@@ -4,7 +4,7 @@ Repository interfaces for the YouTube Archiver application.
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Callable
-from ..domain.entities import VideoInfo, PlaylistInfo, DownloadTask
+from ..domain.entities import VideoInfo, PlaylistInfo, ChannelInfo, DownloadTask
 from ..domain.value_objects import YouTubeURL
 
 
@@ -19,6 +19,11 @@ class IVideoRepository(ABC):
     @abstractmethod
     async def get_playlist_info(self, url: YouTubeURL) -> PlaylistInfo:
         """Get playlist information from URL."""
+        pass
+    
+    @abstractmethod
+    async def get_channel_info(self, url: YouTubeURL) -> ChannelInfo:
+        """Get channel information from URL."""
         pass
 
 
@@ -65,4 +70,19 @@ class IFileRepository(ABC):
     @abstractmethod
     def sanitize_filename(self, filename: str) -> str:
         """Sanitize filename for filesystem compatibility."""
+        pass
+    
+    @abstractmethod
+    def format_video_filename(self, title: str, uploader: str = None) -> str:
+        """Format video filename with [Channel] Title pattern."""
+        pass
+    
+    @abstractmethod
+    def format_audio_filename(self, title: str, uploader: str = None) -> str:
+        """Format audio filename with [Channel] Title pattern."""
+        pass
+    
+    @abstractmethod
+    def get_unique_filename(self, directory: str, filename: str) -> str:
+        """Get unique filename if file already exists."""
         pass

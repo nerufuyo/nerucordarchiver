@@ -35,8 +35,12 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
                     progress = (d['downloaded_bytes'] / d['total_bytes_estimate']) * 100
                     progress_callback(progress)
         
-        filename = self._file_repository.sanitize_filename(task.video_info.title)
-        output_template = os.path.join(task.output_path, f"{filename}.%(ext)s")
+        filename = self._file_repository.format_video_filename(
+            task.video_info.title, 
+            task.video_info.uploader
+        )
+        filename_without_ext = filename.rsplit('.', 1)[0]  # Remove extension for template
+        output_template = os.path.join(task.output_path, f"{filename_without_ext}.%(ext)s")
         
         video_quality = self._quality_manager.get_video_quality()
         format_string = get_video_format_options(video_quality)
@@ -83,13 +87,13 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
                 raise e
         
         # Find the downloaded file
-        expected_path = os.path.join(task.output_path, f"{filename}.{VIDEO_FORMAT}")
+        expected_path = os.path.join(task.output_path, filename)
         if os.path.exists(expected_path):
             return expected_path
         
         # If exact path doesn't exist, find the actual downloaded file
         for file in os.listdir(task.output_path):
-            if file.startswith(filename):
+            if file.startswith(filename_without_ext):
                 return os.path.join(task.output_path, file)
         
         raise RuntimeError("Downloaded file not found")
@@ -113,8 +117,12 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
                 elif d['status'] == 'finished':
                     progress_callback(75)  # 75% after download, before conversion
         
-        filename = self._file_repository.sanitize_filename(task.video_info.title)
-        output_template = os.path.join(task.output_path, f"{filename}.%(ext)s")
+        filename = self._file_repository.format_audio_filename(
+            task.video_info.title, 
+            task.video_info.uploader
+        )
+        filename_without_ext = filename.rsplit('.', 1)[0]  # Remove extension for template
+        output_template = os.path.join(task.output_path, f"{filename_without_ext}.%(ext)s")
         
         audio_quality = self._quality_manager.get_audio_quality()
         audio_format = self._quality_manager.get_audio_format()
@@ -149,13 +157,13 @@ class YTDLPDownloaderRepository(IDownloaderRepository):
         
         # Find the downloaded audio file
         audio_format = self._quality_manager.get_audio_format()
-        expected_path = os.path.join(task.output_path, f"{filename}.{audio_format}")
+        expected_path = os.path.join(task.output_path, filename)
         if os.path.exists(expected_path):
             return expected_path
         
         # If exact path doesn't exist, find the actual downloaded file
         for file in os.listdir(task.output_path):
-            if file.startswith(filename) and file.endswith(f".{audio_format}"):
+            if file.startswith(filename_without_ext) and file.endswith(f".{audio_format}"):
                 return os.path.join(task.output_path, file)
         
         raise RuntimeError("Downloaded audio file not found")

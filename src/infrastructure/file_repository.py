@@ -3,10 +3,9 @@ File repository implementation for file system operations.
 """
 
 import os
-import re
 from pathlib import Path
 from ..repositories.interfaces import IFileRepository
-from ..config.constants import MAX_FILENAME_LENGTH
+from ..utils.file_formatter import FileNameFormatter
 
 
 class FileSystemRepository(IFileRepository):
@@ -32,18 +31,16 @@ class FileSystemRepository(IFileRepository):
     
     def sanitize_filename(self, filename: str) -> str:
         """Sanitize filename for filesystem compatibility."""
-        # Remove or replace invalid characters
-        sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
-        
-        # Remove leading/trailing spaces and dots
-        sanitized = sanitized.strip(' .')
-        
-        # Limit filename length
-        if len(sanitized) > MAX_FILENAME_LENGTH:
-            sanitized = sanitized[:MAX_FILENAME_LENGTH]
-        
-        # Ensure filename is not empty
-        if not sanitized:
-            sanitized = "unknown_file"
-        
-        return sanitized
+        return FileNameFormatter._sanitize_filename(filename)
+    
+    def format_video_filename(self, title: str, uploader: str = None) -> str:
+        """Format video filename with [Channel] Title pattern."""
+        return FileNameFormatter.format_filename(title, uploader, "mp4")
+    
+    def format_audio_filename(self, title: str, uploader: str = None) -> str:
+        """Format audio filename with [Channel] Title pattern."""
+        return FileNameFormatter.format_filename(title, uploader, "mp3")
+    
+    def get_unique_filename(self, directory: str, filename: str) -> str:
+        """Get unique filename if file already exists."""
+        return FileNameFormatter.get_unique_filename(directory, filename)

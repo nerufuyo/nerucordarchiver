@@ -15,9 +15,11 @@ from ..infrastructure.file_repository import FileSystemRepository
 from ..use_cases.download_use_cases import (
     GetVideoInfoUseCase,
     GetPlaylistInfoUseCase,
+    GetChannelInfoUseCase,
     DownloadVideoUseCase,
     DownloadAudioUseCase,
-    DownloadPlaylistUseCase
+    DownloadPlaylistUseCase,
+    DownloadChannelUseCase
 )
 from ..config.settings import Config
 from ..config.constants import APP_NAME, DEFAULT_DOWNLOAD_PATH
@@ -35,6 +37,7 @@ class BatchDownloader:
         # Initialize use cases
         self.get_video_info_use_case = GetVideoInfoUseCase(self.video_repository)
         self.get_playlist_info_use_case = GetPlaylistInfoUseCase(self.video_repository)
+        self.get_channel_info_use_case = GetChannelInfoUseCase(self.video_repository)
         self.download_video_use_case = DownloadVideoUseCase(
             self.downloader_repository, self.file_repository
         )
@@ -42,6 +45,9 @@ class BatchDownloader:
             self.downloader_repository, self.file_repository
         )
         self.download_playlist_use_case = DownloadPlaylistUseCase(
+            self.video_repository, self.downloader_repository, self.file_repository
+        )
+        self.download_channel_use_case = DownloadChannelUseCase(
             self.video_repository, self.downloader_repository, self.file_repository
         )
     

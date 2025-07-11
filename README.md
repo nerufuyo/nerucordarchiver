@@ -9,6 +9,8 @@ A powerful, clean architecture YouTube video and audio downloader with playlist 
 - **Download YouTube Videos**: High-quality video downloads up to 2160p (4K)
 - **Convert to Audio**: Extract and convert videos to MP3 format with customizable quality
 - **Playlist Support**: Download entire playlists with progress tracking
+- **Channel Support**: Browse and download videos from YouTube channels
+- **Selective Downloads**: Choose specific videos from playlists or channels
 - **Batch Downloads**: Process multiple URLs from text files
 - **Quality Control**: Configurable video quality (240p-2160p) and audio bitrates (128-320 kbps)
 - **Format Options**: Support for MP3, FLAC, WAV, AAC audio formats
@@ -69,6 +71,54 @@ NeruCord Archiver supports a wide variety of YouTube and YouTube Music URLs:
 
 ## Usage
 
+### Interactive Mode (Recommended for beginners)
+
+```bash
+# Launch interactive mode with menu-driven interface
+python main.py interactive
+```
+
+The interactive mode provides a user-friendly menu system where you can:
+- See a welcome screen with ASCII art
+- Choose from numbered menu options
+- Get step-by-step guidance for each operation
+- View help and examples
+- Access all features through an intuitive interface
+
+**Example Interactive Session:**
+```
+$ python main.py interactive
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ███╗   ██╗███████╗██████╗ ██╗   ██╗ ██████╗ ██████╗ ██████╗ ██████╗       ║
+║  ████╗  ██║██╔════╝██╔══██╗██║   ██║██╔════╝██╔═══██╗██╔══██╗██╔══██╗      ║
+║  ██╔██╗ ██║█████╗  ██████╔╝██║   ██║██║     ██║   ██║██████╔╝██║  ██║      ║
+║  ██║╚██╗██║██╔══╝  ██╔══██╗██║   ██║██║     ██║   ██║██╔══██╗██║  ██║      ║
+║  ██║ ╚████║███████╗██║  ██║╚██████╔╝╚██████╗╚██████╔╝██║  ██║██████╔╝      ║
+║  ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝       ║
+║                                                                              ║
+║  YouTube Video & Audio Downloader                     v1.1.0              ║
+║  Channel browsing • Selective downloads • Playlist support              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─ MAIN MENU ─────────────────────────────────────────────────────────────────┐
+│  1. 📹 Download Video                 │
+│  2. 🎵 Download Audio (MP3)           │
+│  3. 📋 Download Playlist              │
+│  4. 📺 Browse Channel Videos          │
+│  5. 📥 Download from Channel          │
+│  6. 📄 Batch Download from File       │
+│  7. ℹ️  Get Video/Playlist Info       │
+│  8. ⚙️  Settings & Configuration      │
+│  9. ❓ Help & Examples               │
+│  0. 🚪 Exit                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Enter your choice (0-9): 4
+```
+
+### Command Line Mode
+
 ### Download Single Video
 
 ```bash
@@ -100,6 +150,28 @@ python main.py playlist "https://youtube.com/playlist?list=PLAYLIST_ID" --type v
 
 # Download playlist to specific directory
 python main.py playlist "https://youtube.com/playlist?list=PLAYLIST_ID" --output /path/to/downloads
+```
+
+### Channel Downloads
+
+```bash
+# Browse channel videos (shows list of available videos)
+python main.py browse "https://youtube.com/@channelname/videos"
+
+# Download all videos from a channel as audio
+python main.py channel "https://youtube.com/@channelname/videos" --all --type audio
+
+# Download all videos from a channel as video
+python main.py channel "https://youtube.com/@channelname/videos" --all --type video
+
+# Download selected videos (by index numbers)
+python main.py channel "https://youtube.com/@channelname/videos" --select 1,3,5,7 --type audio
+
+# Download a range of videos (from index 1 to 10)
+python main.py channel "https://youtube.com/@channelname/videos" --select 1-10 --type audio
+
+# Download to specific directory
+python main.py channel "https://youtube.com/@channelname/videos" --select 1,2,3 --output /path/to/downloads
 ```
 
 ### Batch Download
@@ -146,9 +218,17 @@ python main.py info "https://youtube.com/playlist?list=PLAYLIST_ID"
 
 ### Commands
 
+- `interactive` - Launch interactive mode with menu-driven interface (recommended for beginners)
 - `video` - Download YouTube video
 - `audio` - Download and convert YouTube video to MP3
 - `playlist` - Download entire YouTube playlist
+- `browse` - Browse YouTube channel videos with interactive selection
+- `channel` - Download videos from a YouTube channel (all or selected)
+- `batch` - Download multiple videos from a file containing URLs
+- `info` - Get information about YouTube video or playlist
+- `config` - Manage application configuration
+- `playlist` - Download entire YouTube playlist
+- `channel` - Download videos from a YouTube channel
 - `batch` - Download multiple videos from a file containing URLs
 - `config` - Manage application configuration and preferences
 - `info` - Get information about video or playlist
@@ -279,19 +359,21 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **IMPROVED**: Cross-platform Downloads folder detection (Windows/Linux/Mac)
 - **CHANGED**: Default download location to `~/Downloads/NeruCord/` for better organization
 
+### v1.1.0
+- **NEW**: Interactive CLI mode with menu-driven interface
+- **NEW**: Channel browsing and selective video downloads
+- **NEW**: Beautiful ASCII art welcome screen
+- **NEW**: Step-by-step guidance for beginners
+- **ADDED**: `browse` command to preview channel videos
+- **ADDED**: `channel` command with selective download options
+- **ADDED**: `interactive` command for menu-driven operation
+- **ENHANCED**: Support for various channel URL formats (@channel, /channel/ID, /user/username)
+- **IMPROVED**: Better error handling and user feedback
+- **IMPROVED**: Range selection support (e.g., 1-10, 1,3,5-10)
+
 ### v1.0.2
 - **ADDED**: Full support for music.youtube.com URLs and playlists
 - **IMPROVED**: Smart URL detection with helpful error messages when wrong command is used
 - **ENHANCED**: URL normalization to remove tracking parameters for better compatibility
 - **FIXED**: Issue where playlist URLs used with `video` command gave cryptic error messages
 - **ADDED**: Comprehensive tests for music.youtube.com support and URL validation
-
-## Support
-
-For issues and feature requests, please use the GitHub issue tracker.
-
-## Acknowledgments
-
-- Built with [yt-dlp](https://github.com/yt-dlp/yt-dlp) for robust YouTube downloading
-- Inspired by clean architecture principles
-- Thanks to the Python community for excellent tooling

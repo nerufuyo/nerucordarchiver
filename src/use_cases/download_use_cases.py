@@ -3,7 +3,7 @@ Use cases for the YouTube Archiver application.
 """
 
 from typing import List, Optional, Callable
-from ..domain.entities import VideoInfo, PlaylistInfo, DownloadTask, DownloadType, DownloadStatus
+from ..domain.entities import VideoInfo, PlaylistInfo, ChannelInfo, DownloadTask, DownloadType, DownloadStatus
 from ..domain.value_objects import YouTubeURL
 from ..repositories.interfaces import IVideoRepository, IDownloaderRepository, IFileRepository
 from ..config.constants import ERROR_INVALID_URL, ERROR_DOWNLOAD_FAILED, SUCCESS_DOWNLOAD_COMPLETE
@@ -60,6 +60,23 @@ class GetPlaylistInfoUseCase:
             raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
 
 
+class GetChannelInfoUseCase:
+    """Use case for getting channel information."""
+    
+    def __init__(self, video_repository: IVideoRepository):
+        self._video_repository = video_repository
+    
+    async def execute(self, url: str) -> ChannelInfo:
+        """Execute the use case to get channel information."""
+        try:
+            youtube_url = YouTubeURL(url)
+            # Use normalized URL for better compatibility
+            normalized_url = YouTubeURL(youtube_url.normalize_url())
+            return await self._video_repository.get_channel_info(normalized_url)
+        except ValueError as e:
+            raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
+
+
 class DownloadVideoUseCase:
     """Use case for downloading video."""
     
@@ -99,7 +116,7 @@ class DownloadVideoUseCase:
 
 
 class DownloadAudioUseCase:
-    """Use case for downloading and converting to audio."""
+    """Use case for downloading audio."""
     
     def __init__(
         self, 
@@ -115,7 +132,7 @@ class DownloadAudioUseCase:
         output_path: str,
         progress_callback: Optional[Callable[[float], None]] = None
     ) -> str:
-        """Execute the use case to download and convert to audio."""
+        """Execute the use case to download audio."""
         try:
             # Create directory if it doesn't exist
             self._file_repository.create_directory(output_path)
@@ -137,7 +154,7 @@ class DownloadAudioUseCase:
 
 
 class DownloadPlaylistUseCase:
-    """Use case for downloading entire playlist."""
+    """Use case for downloading playlist."""
     
     def __init__(
         self,
@@ -165,6 +182,74 @@ class DownloadPlaylistUseCase:
             total_videos = len(playlist_info.videos)
             
             for index, video_info in enumerate(playlist_info.videos):
+                try:
+                    if progress_callback:
+                        progress_callback(index + 1, total_videos, video_info.title)
+                    
+                    task = DownloadTask(
+                        video_info=video_info,
+                        download_type=download_type,
+                        output_path=output_path
+                    )
+                    
+                    if download_type == DownloadType.AUDIO:
+                        file_path = await self._downloader_repository.download_audio(task)
+                    else:
+                        file_path = await self._downloader_repository.download_video(task)
+                    
+                    downloaded_files.append(file_path)
+                    
+                except Exception as e:
+                    # Log error but continue with next video
+                    print(f"Failed to download {video_info.title}: {str(e)}")
+                    continue
+            
+            return downloaded_files
+            
+        except ValueError as e:
+            raise ValueError(f"{ERROR_INVALID_URL}: {str(e)}")
+        except Exception as e:
+            raise RuntimeError(f"{ERROR_DOWNLOAD_FAILED}: {str(e)}")
+
+
+class DownloadChannelUseCase:
+    """Use case for downloading channel videos."""
+    
+    def __init__(
+        self,
+        video_repository: IVideoRepository,
+        downloader_repository: IDownloaderRepository,
+        file_repository: IFileRepository
+    ):
+        self._video_repository = video_repository
+        self._downloader_repository = downloader_repository
+        self._file_repository = file_repository
+    
+    async def execute(
+        self,
+        channel_url: str,
+        download_type: DownloadType,
+        output_path: str,
+        selected_indices: Optional[List[int]] = None,
+        progress_callback: Optional[Callable[[int, int, str], None]] = None
+    ) -> List[str]:
+        """Execute the use case to download channel videos."""
+        try:
+            youtube_url = YouTubeURL(channel_url)
+            channel_info = await self._video_repository.get_channel_info(youtube_url)
+            
+            # Filter videos by selected indices if provided
+            videos_to_download = channel_info.videos
+            if selected_indices:
+                videos_to_download = [
+                    video for i, video in enumerate(channel_info.videos)
+                    if i in selected_indices
+                ]
+            
+            downloaded_files = []
+            total_videos = len(videos_to_download)
+            
+            for index, video_info in enumerate(videos_to_download):
                 try:
                     if progress_callback:
                         progress_callback(index + 1, total_videos, video_info.title)

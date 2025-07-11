@@ -35,7 +35,7 @@ def get_default_download_path():
 
 # Application Information
 APP_NAME = "NeruCord Archiver"
-APP_VERSION = "1.0.2"
+APP_VERSION = "1.1.0"
 APP_DESCRIPTION = "A powerful YouTube video and audio downloader with playlist support"
 
 # Download Paths
@@ -78,6 +78,9 @@ YOUTUBE_URL_PATTERNS = [
     r"youtube\.com/playlist",
     r"youtube\.com/channel",
     r"youtube\.com/user",
+    r"youtube\.com/c/",
+    r"youtube\.com/@",
+    r"youtube\.com/.*/videos",
     r"music\.youtube\.com/watch",
     r"music\.youtube\.com/playlist",
     r"music\.youtube\.com/album",
